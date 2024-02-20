@@ -1,31 +1,31 @@
 ﻿namespace CsharpAbstractDemo;
 
-public class Unit: GameObject
+public class Unit : GameObject
 {
-  private Rectangle rect;
-  private Vector2 velocity;
-  private float speed = 30f;
-  private Color color;
+  protected Rectangle _rect;
+  private Vector2 _velocity;
+  protected float _speed = 200f;
+  protected IRenderable _renderer;
 
-  public Unit(Vector2 startPosition)
+  public Unit(Vector2 startPosition, IRenderable renderer)
   {
-    rect = new(startPosition.X, startPosition.Y, 64, 64);
-    velocity = Vector2.UnitX;
-    color = Color.Red;
+    _rect = new(startPosition.X, startPosition.Y, 64, 64);
+    _velocity = Vector2.UnitX;
+    _renderer = renderer;
   }
 
   public override void Update(float deltaTime)
   {
-    rect.X += velocity.X * speed * deltaTime;
+    _rect.X += _velocity.X * _speed * deltaTime;
 
-    if (rect.X + rect.Width > Raylib.GetScreenWidth())
+    if (_rect.X + _rect.Width > Raylib.GetScreenWidth() || _rect.X < 0)
     {
-      velocity = -velocity;
+      _velocity = -_velocity;
     }
   }
 
   public override void Draw()
   {
-    Raylib.DrawRectangleRec(rect, color);
+    _renderer.Render(_rect);
   }
 }

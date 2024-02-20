@@ -5,13 +5,29 @@ using CsharpAbstractDemo;
 Raylib.InitWindow(800, 600, "StratGame");
 Raylib.SetTargetFPS(60);
 
+UnitRenderer regularUnitRenderer = new(Color.Red);
+UnitRenderer otherUnitRenderer = new(Color.Green);
+
+
 // Create units
-Unit unit = new(Vector2.Zero);
+List<Unit> units = new();
+units.Add(new Unit(Vector2.Zero, regularUnitRenderer));
+units.Add(new Unit(new Vector2(64, 128), regularUnitRenderer));
+GreenUnit green = new GreenUnit(new Vector2(0, 256), otherUnitRenderer);
+units.Add(green);
 
 // Create buttons
 List<Button> buttons = new();
 buttons.Add(new Button(new(10, 400, 140, 30), "KLIKME", () => Console.WriteLine("hey!")));
 buttons.Add(new Button(new(160, 400, 140, 30), "KLIKME2", () => Console.WriteLine("whoa!")));
+
+List<IClickable> clickables = new();
+clickables.AddRange(buttons);
+clickables.Add(green);
+
+List<IDrawable> drawables = new();
+drawables.AddRange(units);
+drawables.AddRange(buttons);
 
 while (!Raylib.WindowShouldClose())
 {
@@ -20,15 +36,15 @@ while (!Raylib.WindowShouldClose())
   Vector2 mousePosition = Raylib.GetMousePosition();
 
   // Update logic
-  unit.Update(deltaTime);
+  units.ForEach(u => u.Update(deltaTime));
 
   if (Raylib.IsMouseButtonPressed(0))
   {
-    foreach (Button b in buttons)
+    foreach (IClickable c in clickables)
     {
-      if (b.PointIsInside(mousePosition))
+      if (c.IsHovering(mousePosition))
       {
-        b.Click();
+        c.Click();
       }
     }
   }
@@ -37,9 +53,7 @@ while (!Raylib.WindowShouldClose())
   Raylib.BeginDrawing();
   Raylib.ClearBackground(Color.White);
 
-  unit.Draw();
-
-  buttons.ForEach(t => t.Draw());
+  drawables.ForEach(d => d.Draw());
 
   Raylib.EndDrawing();
 }
